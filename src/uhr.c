@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 
 
 // helpful functions 
@@ -18,7 +19,8 @@ void side_alt_balken_display ( struct tm *current_time );
 void timestamp_display ( struct tm *current_time );
 void timestamp_break_display ( struct tm *current_time );
 void big_display ( struct tm *current_time );
-#define NUM_DISPLAYS 8
+void clock_display ( struct tm *current_time );
+#define NUM_DISPLAYS 9
 
 int main ( int argc, char **argv ) {
 	struct tm current_time;
@@ -36,7 +38,8 @@ int main ( int argc, char **argv ) {
 		"balken_alt",
 		"timestamp",
 		"timestamp_break",
-		"big"
+		"big",
+	  "clock"
 	};
 
 	void (*funcp[])(struct tm *) = {
@@ -47,7 +50,8 @@ int main ( int argc, char **argv ) {
 		side_alt_balken_display,
 		timestamp_display,
 		timestamp_break_display,
-		big_display
+		big_display,
+		clock_display
 	};
 
 	//parsing arguments
@@ -284,5 +288,64 @@ void big_display ( struct tm *current_time ) {
 			printf ( "%s   ", numbers + needed_numbers[y] * offset + x * 6);
 		}
 		puts ("");
+	}
+}
+
+
+#define CSIZE (33)
+
+void draw_line(char *clock, int degrees, double radius, char c, double length) {
+	int i;
+	int size = radius * 2;
+	for(i = 0; i < radius * length; i++) {
+		int posx = round(sin(degrees / 180.0 * M_PI) * i + radius);
+		int posy = round(cos(degrees / 180.0 * M_PI) * i + radius);
+		if(posx >= 0 && posx < CSIZE && posy >= 0 && posy < CSIZE) {
+			*(clock + posx * size + posy) = c;
+		}
+	}
+}
+void clock_display ( struct tm *current_time) {
+	double radius = CSIZE / 2.0;
+
+	char clock[CSIZE][CSIZE] = {};
+
+	// fill the whole array with spaces
+	memset(clock, ' ', CSIZE * CSIZE);
+
+	int i;
+
+	// draw the circle where the clock is in
+	for(i = 0; i < 360; i++) {
+		int posx = floor(sin(i / 180.0 * M_PI) * radius + radius);
+		int posy = floor(cos(i / 180.0 * M_PI) * radius + radius);
+		if(posx >= 0 && posx < CSIZE && posy >= 0 && posy < CSIZE) {
+			clock[posx][posy] = '#';
+		}
+	}
+
+
+	// draw the line for the seconds
+	draw_line((char *)clock, (current_time->tm_sec * 6 + 270) % 360 , radius, 'S', 1);
+	// draw the line for the minutes
+	draw_line((char *)clock, (current_time->tm_min * 6 + 270) % 360, radius, 'M', 0.8);
+	// draw the line for the hours
+	draw_line((char *)clock, ((current_time->tm_hour % 12) * 30 + 270) % 360, radius, 'H', 0.5);
+
+
+	//place this in the middle of the clock
+	clock[(int)round(radius)][(int)round(radius)] = 'O';
+
+	// clear the screen
+	clear();
+
+	int x,y;
+
+	//print the new/updated clock
+	for(x = 0; x < CSIZE; x++) {
+		for(y = 0; y < CSIZE; y++) {
+			printf("%c%c", clock[x][y] , clock[x][y] );
+		}
+		puts("");
 	}
 }
