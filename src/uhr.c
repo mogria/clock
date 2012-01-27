@@ -96,7 +96,7 @@ int main ( int argc, char **argv ) {
 }
 
 void clear ( ) {
-	puts("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	puts("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 }
 
 void wait_for ( struct timespec delay ) {
@@ -310,10 +310,25 @@ void clock_display ( struct tm *current_time) {
 
 	char clock[CSIZE][CSIZE] = {};
 
+	int i,x,y;
+
 	// fill the whole array with spaces
 	memset(clock, ' ', CSIZE * CSIZE);
 
-	int i;
+	for(x = 0; x < CSIZE; x++) {
+		for(y = 0; y < CSIZE; y++) {
+			double dx, dy, distance;
+
+			dx =  x < radius ? radius - (double)x : (double)x - radius;
+			dy =  y < radius ? radius - (double)y : (double)y - radius;
+			distance = sqrt(dx * dx + dy * dy);
+
+			if ( distance < radius + 0.0000001 ) {
+				clock[x][y] = '.';
+			}
+		}
+	}
+
 
 	// draw the circle where the clock is in
 	for(i = 0; i < 360; i++) {
@@ -338,8 +353,6 @@ void clock_display ( struct tm *current_time) {
 
 	// clear the screen
 	clear();
-
-	int x,y;
 
 	//print the new/updated clock
 	for(x = 0; x < CSIZE; x++) {
