@@ -292,7 +292,7 @@ void big_display ( struct tm *current_time ) {
 }
 
 
-#define CSIZE (33)
+#define CSIZE (32)
 
 void draw_line(char *clock, int degrees, double radius, char c, double length) {
 	int i;
@@ -315,6 +315,7 @@ void clock_display ( struct tm *current_time) {
 	// fill the whole array with spaces
 	memset(clock, ' ', CSIZE * CSIZE);
 
+	// fill the background of the clock
 	for(x = 0; x < CSIZE; x++) {
 		for(y = 0; y < CSIZE; y++) {
 			double dx, dy, distance;
@@ -329,17 +330,6 @@ void clock_display ( struct tm *current_time) {
 		}
 	}
 
-
-	// draw the circle where the clock is in
-	for(i = 0; i < 360; i++) {
-		int posx = floor(sin(i / 180.0 * M_PI) * radius + radius);
-		int posy = floor(cos(i / 180.0 * M_PI) * radius + radius);
-		if(posx >= 0 && posx < CSIZE && posy >= 0 && posy < CSIZE) {
-			clock[posx][posy] = '#';
-		}
-	}
-
-
 	// draw the line for the seconds
 	draw_line((char *)clock, (current_time->tm_sec * 6 + 270) % 360 , radius, 'S', 1);
 	// draw the line for the minutes
@@ -350,6 +340,15 @@ void clock_display ( struct tm *current_time) {
 
 	//place this in the middle of the clock
 	clock[(int)round(radius)][(int)round(radius)] = 'O';
+
+	// draw the circle of the clock
+	for(i = 0; i < 360; i++) {
+		int posx = floor(sin(i / 180.0 * M_PI) * radius + radius);
+		int posy = floor(cos(i / 180.0 * M_PI) * radius + radius);
+		if(posx >= 0 && posx < CSIZE && posy >= 0 && posy < CSIZE) {
+			clock[posx][posy] = '#';
+		}
+	}
 
 	// clear the screen
 	clear();
