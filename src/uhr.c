@@ -312,6 +312,8 @@ void clock_display ( struct tm *current_time) {
 
 	int i,x,y;
 
+	int seconds, minutes;
+
 	// fill the whole array with spaces
 	memset(clock, ' ', CSIZE * CSIZE);
 
@@ -331,11 +333,17 @@ void clock_display ( struct tm *current_time) {
 	}
 
 	// draw the line for the seconds
-	draw_line((char *)clock, (current_time->tm_sec * 6 + 270) % 360 , radius, 'S', 1);
+	draw_line((char *)clock,
+			((int)round(seconds = current_time->tm_sec * 6) + 270) % 360,
+			radius, 'S', 1);
 	// draw the line for the minutes
-	draw_line((char *)clock, (current_time->tm_min * 6 + 270) % 360, radius, 'M', 0.8);
+	draw_line((char *)clock,
+			((int)round(minutes = current_time->tm_min * 6 + seconds / 60.0) + 270) % 360,
+			radius, 'M', 0.8);
 	// draw the line for the hours
-	draw_line((char *)clock, ((current_time->tm_hour % 12) * 30 + 270) % 360, radius, 'H', 0.5);
+	draw_line((char *)clock,
+			((int)round(current_time->tm_hour % 12 * 30 + minutes / 12.0) + 270) % 360,
+			radius, 'H', 0.5);
 
 
 	//place this in the middle of the clock
