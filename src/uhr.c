@@ -292,7 +292,7 @@ void big_display ( struct tm *current_time ) {
 }
 
 
-#define CSIZE (32)
+#define CSIZE (60)
 
 void draw_line(char *clock, int degrees, double radius, char c, double length) {
 	int i;
@@ -366,6 +366,10 @@ void clock_display ( struct tm *current_time) {
 		for(y = 0; y < CSIZE; y++) {
 			printf("%c%c", clock[x][y] , clock[x][y] );
 		}
-		puts("");
+		if (x != CSIZE - 1) {
+			puts("");
+		} else {
+			fflush(stdout);
+		}
 	}
 }
