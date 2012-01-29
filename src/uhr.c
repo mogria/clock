@@ -360,6 +360,10 @@ void clock_display ( struct tm *current_time) {
 		clock_set_content((char *)clock, i, radius - 0.5, radius, '#');
 	}
 
+	for(i = 0; i < 360; i += 30) {
+		clock_set_content((char *)clock, i, radius - 0.5, radius, 'O');
+	}
+
 	// clear the screen
 	clear();
 
