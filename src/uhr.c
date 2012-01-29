@@ -294,17 +294,22 @@ void big_display ( struct tm *current_time ) {
 
 #define CSIZE (60)
 
-void draw_line(char *clock, int degrees, double radius, char c, double length) {
+void clock_set_content(char *clock, double degrees, double length, double radius, char value) {
+	int size = round(radius * 2);
+	int posx = round(sin(degrees / 180.0 * M_PI) * length + radius);
+	int posy = round(cos(degrees / 180.0 * M_PI) * length + radius);
+	if(posx >= 0 && posx < size && posy >= 0 && posy < size) {
+		*(clock + posx * size + posy) = value;
+	}
+}
+void draw_line(char *clock, double degrees, double radius, char c, double length) {
 	int i;
 	int size = radius * 2;
 	for(i = 0; i < radius * length; i++) {
-		int posx = round(sin(degrees / 180.0 * M_PI) * i + radius);
-		int posy = round(cos(degrees / 180.0 * M_PI) * i + radius);
-		if(posx >= 0 && posx < CSIZE && posy >= 0 && posy < CSIZE) {
-			*(clock + posx * size + posy) = c;
-		}
+		clock_set_content(clock, degrees, i, radius, c);
 	}
 }
+
 void clock_display ( struct tm *current_time) {
 	double radius = CSIZE / 2.0;
 
@@ -321,8 +326,8 @@ void clock_display ( struct tm *current_time) {
 	for(x = 0; x < CSIZE; x++) {
 		for(y = 0; y < CSIZE; y++) {
 			double dx, dy, distance;
-			dx = x + 0.5;
-			dy = y + 0.5;
+			dx = x /* + 0.5 */;
+			dy = y /* + 0.5 */;
 			dx =  dx < radius ? radius - dx : dx - radius;
 			dy =  dy < radius ? radius - dy : dy - radius;
 			distance = sqrt(dx * dx + dy * dy);
@@ -352,11 +357,7 @@ void clock_display ( struct tm *current_time) {
 
 	// draw the circle of the clock
 	for(i = 0; i < 360; i++) {
-		int posx = floor(sin(i / 180.0 * M_PI) * radius + radius);
-		int posy = floor(cos(i / 180.0 * M_PI) * radius + radius);
-		if(posx >= 0 && posx < CSIZE && posy >= 0 && posy < CSIZE) {
-			clock[posx][posy] = '#';
-		}
+		clock_set_content((char *)clock, i, radius - 0.5, radius, '#');
 	}
 
 	// clear the screen
