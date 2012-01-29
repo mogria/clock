@@ -321,12 +321,13 @@ void clock_display ( struct tm *current_time) {
 	for(x = 0; x < CSIZE; x++) {
 		for(y = 0; y < CSIZE; y++) {
 			double dx, dy, distance;
-
-			dx =  x < radius ? radius - (double)x : (double)x - radius;
-			dy =  y < radius ? radius - (double)y : (double)y - radius;
+			dx = x + 0.5;
+			dy = y + 0.5;
+			dx =  dx < radius ? radius - dx : dx - radius;
+			dy =  dy < radius ? radius - dy : dy - radius;
 			distance = sqrt(dx * dx + dy * dy);
 
-			if ( distance < radius + 0.0000001 ) {
+			if ( distance < radius ) {
 				clock[x][y] = '.';
 			}
 		}
