@@ -4,6 +4,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <unistd.h>
+
 
 // helpful functions 
 void clear ( );
@@ -29,6 +31,8 @@ int main ( int argc, char **argv ) {
 
 	int i;
 	int index = 0;
+  int times = 0;
+  int counter = 0;
 
 	char *names[] =  {
 		"simple",
@@ -54,32 +58,41 @@ int main ( int argc, char **argv ) {
 		clock_display
 	};
 
-	//parsing arguments
-	if ( argc > 1 ) {
-		if ( argv[1][0] == '-' ) {
-			if ( argv[1][1] == 'l' ) {
-				printf("possible %i display styles: \n", NUM_DISPLAYS);
+  int opt;
+
+	//parsing arguments using getopt
+  while((opt = getopt(argc, argv, "hln:")) != -1) {
+    switch(opt) {
+      case 'n':
+        // how many times the clock is refreshed (0 -> endless)
+        times = atoi(optarg);
+        break;
+      case 'l':
+        // this lists out all the styles
+        printf("possible %i display styles: \n", NUM_DISPLAYS);
 				for ( i = 0; i < NUM_DISPLAYS; i++ ) {
 					printf ("   - %s\n", names[i]);
 				}
-				exit(0);
-			} else if ( argv[1][1] == 'h' ) {
-				puts ( "This programm displays a clock on the screen." );
-				printf( "%s [-l] [-h] [display_style]\n\n", argv[0] );
-				puts ( "This awesome programm is written by Mogria." );
-				exit(0);
-			}
-		} else {
-			for ( i = 0; i < NUM_DISPLAYS; i++) {
-				if ( strcmp ( names[i], argv[1] ) == 0 ) {
-					index = i;
-				}
-			}
-		}
+				exit(EXIT_SUCCESS);
+      case 'h':
+      default:
+        puts("This programm displays a clock on the screen in diffrent styles. Use option -l");
+        puts("to list them all out." );
+				printf("USAGE: %s [-l] [-n times] [-h] [display_style]\n\n", argv[0]);
+				puts("This awesome programm is written by Mogria.");
+				exit(EXIT_FAILURE);
+    }
+  }
+	if ( optind < argc ) {
+    for ( i = 0; i < NUM_DISPLAYS; i++) {
+      if ( strcmp ( names[i], argv[optind] ) == 0 ) {
+        index = i;
+      }
+    }
 	}
 
-	// endless loop
-	while ( 1 ) {
+  // main loop
+	while ( times == 0 || counter++ < times ) {
 		// get the current time
 		time(&timestamp);
 		current_time = *localtime(&timestamp);
@@ -88,8 +101,10 @@ int main ( int argc, char **argv ) {
 		funcp[index](&current_time);
 
 		// delaying
-		delay.tv_sec = 1;
-		wait_for(delay);
+    if(times == 0 || counter != times) {
+      delay.tv_sec = 1;
+      wait_for(delay);
+    }
 	}
 
 	return EXIT_SUCCESS;
